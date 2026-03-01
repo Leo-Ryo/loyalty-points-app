@@ -1,0 +1,44 @@
+# ========================
+# Environment / Secrets
+# ========================
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+
+# ========================
+# Node Modules
+# ========================
+node_modules/
+.pnp
+.pnp.js
+
+# ========================
+# Build Output
+# ========================
+dist/
+dist-ssr/
+build/
+
+# ========================
+# Logs
+# ========================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ========================
+# Editor / OS Files
+# ========================
+.DS_Store
+Thumbs.db
+.vscode/settings.json
+
+# ========================
+# Prisma
+# ========================
+# Keep schema.prisma but ignore generated client if desired
+# prisma/generated/

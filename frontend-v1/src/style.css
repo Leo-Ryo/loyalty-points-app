@@ -1,0 +1,341 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+/* ── Design Tokens ── */
+@theme {
+  /* ─ Brand Blues (user palette) ─ */
+  --color-primary: #8DC1FF;
+  /* Blue 300 — primary buttons, active nav */
+  --color-primary-hover: #4E9FFF;
+  /* Blue 400 — hover/pressed state */
+  --color-primary-focus: #C3DDFF;
+  /* Blue 200 — focus rings, subtle accents */
+  --color-primary-light: #E3EFFF;
+  /* Blue 100 — tinted chip backgrounds */
+
+  /* ─ Neutral slate (user palette) ─ */
+  --color-navy: #19213D;
+  /* Neutral 800 — sidebar, headings */
+  --color-navy-mid: #353E5C;
+  /* Neutral 700 — secondary headings */
+  --color-text-primary: #19213D;
+  /* Neutral 800 */
+  --color-text-secondary: #6D758F;
+  /* Neutral 600 */
+  --color-text-muted: #A1A7BB;
+  /* Neutral 500 */
+
+  /* ─ Surfaces ─ */
+  --color-bg-page: #F8FAFF;
+  /* Neutral 200 — page background */
+  --color-bg-card: #FFFFFF;
+  /* White — card surface */
+  --color-bg-hover: #EDEFF5;
+  /* Neutral 300 — hover bg */
+  --color-border: #D7DBE7;
+  /* Neutral 400 — card/input border */
+  --color-border-mid: #A1A7BB;
+  /* Neutral 500 — stronger border */
+
+  /* ─ Semantic ─ */
+  --color-destructive: #DC2626;
+  --color-success: #16A34A;
+  --color-warning: #D97706;
+
+  /* ─ Legacy aliases (so old hardcoded usages still work) ─ */
+  --color-surface: #EDEFF5;
+  --color-subtle: #EDEFF5;
+  --color-border-light: #D7DBE7;
+  --color-border-strong: #A1A7BB;
+
+  --font-family-sans: 'Inter', ui-sans-serif, system-ui;
+
+  /* ─ Shadow system ─ */
+  --shadow-xs: 0 1px 2px rgba(25, 33, 61, 0.04);
+  --shadow-sm: 0 1px 3px rgba(25, 33, 61, 0.06), 0 1px 2px rgba(25, 33, 61, 0.04);
+  --shadow-card: 0 2px 8px rgba(25, 33, 61, 0.07), 0 1px 3px rgba(25, 33, 61, 0.04);
+  --shadow-card-hover: 0 12px 32px rgba(25, 33, 61, 0.12), 0 4px 10px rgba(25, 33, 61, 0.07);
+  --shadow-float: 0 24px 64px rgba(25, 33, 61, 0.16), 0 8px 24px rgba(25, 33, 61, 0.08);
+  --shadow-modal: 0 32px 80px rgba(25, 33, 61, 0.22), 0 8px 24px rgba(25, 33, 61, 0.10);
+  --shadow-inset: inset 0 1px 3px rgba(25, 33, 61, 0.07);
+
+  /* ─ Radii ─ */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-pill: 99px;
+
+  /* ─ Glass ─ */
+  --glass-dark: rgba(25, 33, 61, 0.92);
+  /* navy glass */
+  --glass-light: rgba(255, 255, 255, 0.85);
+  --blur-glass: blur(20px);
+  --blur-modal: blur(16px);
+}
+
+/* ── Base ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  font-family: 'Inter', ui-sans-serif, system-ui;
+  background: #F8FAFF;
+  /* Neutral 200 */
+  color: #19213D;
+  /* Neutral 800 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D7DBE7;
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A1A7BB;
+}
+
+/* ── Glass utility ── */
+.glass-dark {
+  background: var(--glass-dark);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+}
+
+.glass-light {
+  background: var(--glass-light);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+}
+
+/* ── 3D Card Effect ── */
+.card-3d {
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.card-3d:hover {
+  transform: translateY(-6px) perspective(800px) rotateX(1.5deg);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* ── Stat Card ── */
+.stat-card {
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px) perspective(700px) rotateX(2deg);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* ── Button Effects ── */
+.btn-3d {
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
+}
+
+.btn-3d:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+}
+
+.btn-3d:active:not(:disabled) {
+  transform: scale(0.97) translateY(0);
+  box-shadow: none;
+  transition-duration: 0.08s;
+}
+
+/* ── Nav Item ── */
+.nav-item {
+  transition: background 0.18s ease, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.18s ease;
+}
+
+.nav-item:hover {
+  transform: translateX(2px);
+}
+
+.nav-item.active {
+  background: rgba(141, 193, 255, 0.18);
+  /* Blue 300 tint */
+  color: #FFFFFF;
+}
+
+/* ── Ad Card ── */
+.ad-card {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+.ad-card:hover {
+  transform: translateY(-5px) perspective(800px) rotateX(1.2deg);
+  box-shadow: var(--shadow-float);
+}
+
+.ad-card img {
+  transition: transform 0.4s ease;
+}
+
+.ad-card:hover img {
+  transform: scale(1.05);
+}
+
+/* ── Reward Card ── */
+.reward-card {
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+}
+
+.reward-card:hover {
+  transform: translateY(-8px) perspective(700px) rotateX(2deg) rotateY(-0.8deg);
+  box-shadow: var(--shadow-float);
+  border-color: #8DC1FF;
+  /* Blue 300 */
+}
+
+/* ── Points Badge Pulse ── */
+@keyframes pointsPulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+.points-pulse {
+  animation: pointsPulse 3s ease-in-out infinite;
+}
+
+/* ── Page enter animation ── */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: pageEnter 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ── Stagger children ── */
+.stagger>* {
+  opacity: 0;
+  animation: pageEnter 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.stagger>*:nth-child(1) {
+  animation-delay: 0.04s;
+}
+
+.stagger>*:nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.stagger>*:nth-child(3) {
+  animation-delay: 0.12s;
+}
+
+.stagger>*:nth-child(4) {
+  animation-delay: 0.16s;
+}
+
+.stagger>*:nth-child(5) {
+  animation-delay: 0.20s;
+}
+
+.stagger>*:nth-child(6) {
+  animation-delay: 0.24s;
+}
+
+/* ── Fade & Slide Transitions ── */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.22s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.slide-up-enter-from {
+  transform: translateY(12px);
+  opacity: 0;
+}
+
+.slide-up-leave-to {
+  transform: translateY(-6px);
+  opacity: 0;
+}
+
+/* ── Modal Backdrop ── */
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.25s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-active .modal-box,
+.modal-leave-active .modal-box {
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-enter-from .modal-box,
+.modal-leave-to .modal-box {
+  transform: scale(0.93) translateY(12px);
+}
+
+/* ── Shimmer skeleton ── */
+@keyframes shimmer {
+  from {
+    background-position: -400px 0;
+  }
+
+  to {
+    background-position: 400px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #F0F0F0 25%, #E8E8E8 50%, #F0F0F0 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 8px;
+}
