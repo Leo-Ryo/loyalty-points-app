@@ -18,6 +18,15 @@ const props = defineProps({
 
 const emit = defineEmits(['view-details', 'quick-redeem']);
 
+import { inject } from 'vue';
+const openLogin = inject('openLogin');
+const cart = inject('cart');
+
+function addToCart(item) {
+  cart.value.push(item);
+  emit('quick-redeem', item); // keep the emit just in case
+}
+
 const isAvailable = computed(() => props.item.stock > 0);
 const isLimited = computed(() => props.item.stock > 0 && props.item.stock <= 5);
 const canAfford = computed(() => props.isLoggedIn && props.userPoints >= props.item.pointsCost);
@@ -109,39 +118,26 @@ const availabilityConfig = computed(() => {
         Details
       </button>
 
-      <!-- Guest Mode: Sign in prompt -->
-      <div v-if="!isLoggedIn && isAvailable" class="w-full">
-        <button
-          @click="emit('view-details', item)"
-          class="w-full flex flex-col items-center justify-center bg-pastel-blue hover:bg-pastel-peri/60 text-indigo-700 font-bold text-[11px] rounded-xl py-2 transition-all duration-200 active:scale-95 gap-1"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-          </svg>
-          <span>Sign In</span>
-        </button>
-      </div>
-
-      <!-- Logged-in: Can afford → Redeem -->
-      <div v-else-if="isLoggedIn && isAvailable && canAfford" class="w-full">
-        <button
-          @click="emit('quick-redeem', item)"
-          class="w-full flex flex-col items-center justify-center bg-pastel-salmon hover:bg-[#F97B8F] text-white font-bold text-[11px] rounded-xl py-2 shadow-salmon transition-all duration-200 active:scale-95 gap-1"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-          </svg>
-          <span>Redeem</span>
-        </button>
-      </div>
-
-      <!-- Logged-in: Can't afford yet -->
-      <div v-else-if="isLoggedIn && isAvailable && !canAfford" class="w-full">
+      <!-- Can't afford let -->
+      <div v-if="isLoggedIn && isAvailable && !canAfford" class="w-full">
         <button disabled class="w-full flex flex-col items-center justify-center bg-gray-100 text-gray-400 font-bold text-[11px] rounded-xl py-2 cursor-not-allowed gap-1">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
           </svg>
           <span>Need<br/>{{ (item.pointsCost - userPoints).toLocaleString() }} more</span>
+        </button>
+      </div>
+
+      <!-- Guest / Logged in & can afford -->
+      <div v-else-if="isAvailable" class="w-full">
+        <button
+          @click="addToCart(item)"
+          class="w-full flex flex-col items-center justify-center bg-pastel-salmon hover:bg-[#F97B8F] text-white font-bold text-[11px] rounded-xl py-2 shadow-salmon transition-all duration-200 active:scale-95 gap-1"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+          <span>Add</span>
         </button>
       </div>
 

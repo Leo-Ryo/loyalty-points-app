@@ -1,15 +1,9 @@
 <script setup>
 import { ref, provide } from 'vue';
-import KioskMain from './views/KioskMain.vue';
-import InventoryView from './views/InventoryView.vue';
-import OffersView from './views/OffersView.vue';
-import AccountView from './views/AccountView.vue';
-import KioskNavBar from './components/KioskNavBar.vue';
-import LoginView from './views/LoginView.vue';
+import LoginView from './views/kiosk/LoginView.vue';
 
-const activeTab = ref('home');
-
-// ── Global auth state ──
+// ── Global App State ──
+const cart = ref([]);
 const currentUser = ref(null);
 const showLogin   = ref(false);
 
@@ -22,19 +16,13 @@ function handleLogout() {
   currentUser.value = null;
 }
 
-// Navigate to account tab → show login if not signed in
-function goToAccount() {
-  if (!currentUser.value) {
-    showLogin.value = true;
-  } else {
-    activeTab.value = 'account';
-  }
-}
+// Global login modal flow (can be refactored eventually if Staff needs separate login)
 
-// Provide auth state so child views can read/trigger it
+// Provide auth & cart state so child views can read/trigger it
 provide('currentUser', currentUser);
 provide('openLogin', () => { showLogin.value = true; });
 provide('logout', handleLogout);
+provide('cart', cart);
 </script>
 
 <template>
@@ -49,22 +37,8 @@ provide('logout', handleLogout);
       />
     </Transition>
 
-    <!-- Page views -->
-    <Transition name="fade" mode="out-in">
-      <KioskMain     v-if="activeTab === 'home'"      key="home" />
-      <InventoryView v-else-if="activeTab === 'inventory'" key="inventory" />
-      <OffersView    v-else-if="activeTab === 'offers'"    key="offers" />
-      <AccountView   v-else-if="activeTab === 'account'"   key="account" />
-    </Transition>
-
-    <!-- Nav bar -->
-    <KioskNavBar
-      :active-tab="activeTab"
-      @update:active-tab="(tab) => {
-        if (tab === 'account') { goToAccount(); }
-        else { activeTab = tab; }
-      }"
-    />
+    <!-- Router controls the full page layout (Kiosk vs Staff) -->
+    <router-view />
 
   </div>
 </template>

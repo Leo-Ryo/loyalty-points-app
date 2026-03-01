@@ -42,3 +42,14 @@ Thumbs.db
 # ========================
 # Keep schema.prisma but ignore generated client if desired
 # prisma/generated/
+
+# ========================
+# Electron Output
+# ========================
+dist-electron/
+release/
+*.exe
+*.dll
+*.pak
+*.bin
+*.dat

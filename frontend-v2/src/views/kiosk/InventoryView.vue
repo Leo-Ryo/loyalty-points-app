@@ -1,10 +1,11 @@
 <script setup>
-import { ref, computed } from 'vue';
-import ItemCard from '../components/ItemCard.vue';
+import { ref, computed, inject } from 'vue';
+import ItemCard from '../../components/kiosk/ItemCard.vue';
 
-// ── Demo toggle: simulate logged-in vs. guest ──
-const isLoggedIn = ref(false);
-const userPoints = ref(1200);
+// ── Auth State ──
+const currentUser = inject('currentUser');
+const isLoggedIn = computed(() => !!currentUser.value);
+const userPoints = computed(() => currentUser.value ? (currentUser.value.points || 0) : 0);
 
 // ── Inventory mock data ──
 const allItems = ref([
@@ -56,21 +57,10 @@ const availableCount = computed(() => filteredItems.value.filter(i => i.stock > 
           </p>
         </div>
 
-        <!-- ── Demo: Guest/Logged-in toggle ── -->
+        <!-- ── User Balance ── -->
         <div class="flex flex-col items-end gap-1">
-          <div
-            @click="isLoggedIn = !isLoggedIn"
-            class="flex items-center gap-2 cursor-pointer bg-white rounded-xl px-3 py-2 border border-gray-100 shadow-glass hover:shadow-glass-nav transition-all select-none"
-          >
-            <div class="w-8 h-5 rounded-full transition-all duration-300 flex items-center px-0.5" :class="isLoggedIn ? 'bg-pastel-salmon' : 'bg-gray-200'">
-              <div class="w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-300" :class="isLoggedIn ? 'translate-x-3' : ''"></div>
-            </div>
-            <span class="text-xs font-bold" :class="isLoggedIn ? 'text-pastel-salmon' : 'text-gray-400'">
-              {{ isLoggedIn ? 'Logged in' : 'Guest' }}
-            </span>
-          </div>
-          <span v-if="isLoggedIn" class="text-[11px] text-gray-400">
-            Your balance: <strong class="text-pastel-salmon">{{ userPoints.toLocaleString() }} pts</strong>
+          <span v-if="isLoggedIn" class="text-sm font-bold bg-white px-4 py-2 rounded-xl shadow-glass border border-gray-100 text-gray-600">
+            Balance: <strong class="text-pastel-salmon">{{ userPoints.toLocaleString() }} pts</strong>
           </span>
         </div>
       </div>

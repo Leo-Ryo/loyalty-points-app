@@ -1,7 +1,10 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
 import SpecialOffersCarousel from '../components/SpecialOffersCarousel.vue';
 import OfferCard from '../components/OfferCard.vue';
+
+const currentUser = inject('currentUser');
+const openLogin = inject('openLogin');
 
 // Mock Data for the Offer Grid
 const inventory = ref([
@@ -66,13 +69,22 @@ const inventory = ref([
         <p class="text-lg text-gray-500 font-medium">Discover your rewards and special offers.</p>
       </div>
       
-      <!-- Login Kiosk Button -->
-      <button class="bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-full shadow-lg transform transition hover:scale-105 active:scale-95 flex items-center space-x-2">
+      <!-- Login Kiosk Button / User Avatar -->
+      <button v-if="!currentUser" @click="openLogin" class="bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-full shadow-lg transform transition hover:scale-105 active:scale-95 flex items-center space-x-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
         </svg>
         <span>Sign In</span>
       </button>
+      <div v-else class="flex items-center gap-3 bg-white rounded-full pl-2 pr-4 py-1.5 shadow-glass border border-gray-100 cursor-pointer hover:shadow-glass-nav transition">
+        <div class="w-10 h-10 rounded-full bg-pastel-salmon flex items-center justify-center text-white font-bold text-lg">
+          {{ currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U' }}
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xs font-bold text-gray-900 leading-tight">{{ currentUser.name || 'User' }}</span>
+          <span class="text-[10px] font-semibold text-pastel-salmon">{{ (currentUser.points || 0).toLocaleString() }} pts</span>
+        </div>
+      </div>
     </header>
 
     <!-- Carousel Section -->

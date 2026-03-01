@@ -1,10 +1,13 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { computed, inject, ref } from 'vue';
 
-// ── Demo toggle ──
-const isLoggedIn = ref(false);
-const userTier   = ref('silver'); // 'none' | 'silver' | 'gold'
-const isNewUser  = ref(true);
+// ── Auth State ──
+const currentUser = inject('currentUser');
+const openLogin = inject('openLogin');
+const cart = inject('cart');
+const isLoggedIn = computed(() => !!currentUser.value);
+const userTier   = computed(() => currentUser.value ? (currentUser.value.tier || 'silver') : 'none');
+const isNewUser  = computed(() => currentUser.value ? (currentUser.value.isNewUser || false) : true);
 
 // ── Offer config per type ──
 const offerTypeConfig = {
@@ -108,6 +111,20 @@ function timeLeft(endDate) {
   return `${hrs}h ${mins}m left`;
 }
 
+function isClaimed(offer) {
+  return cart.value.some(item => item.id === offer.id && item.isOffer === true);
+}
+
+function claimOffer(offer) {
+  if (isClaimed(offer)) return;
+  cart.value.push({
+    ...offer,
+    isOffer: true,
+    pointsCost: 0, // Offers don't cost points to claim 
+    name: offer.title // map title to name for the cart UI
+  });
+}
+
 // Sort: unlocked first
 const sortedOffers = computed(() =>
   [...offers.value].sort((a, b) => Number(isUnlocked(b)) - Number(isUnlocked(a)))
@@ -125,16 +142,10 @@ const sortedOffers = computed(() =>
           <p class="text-sm text-gray-400 mt-1 font-medium">Exclusive deals &amp; point boosts</p>
         </div>
 
-        <!-- Demo toggle -->
+        <!-- User Tier -->
         <div class="flex flex-col items-end gap-2">
-          <div @click="isLoggedIn = !isLoggedIn" class="flex items-center gap-2 cursor-pointer bg-white rounded-xl px-3 py-2 border border-gray-100 shadow-glass transition-all select-none">
-            <div class="w-8 h-5 rounded-full transition-all duration-300 flex items-center px-0.5" :class="isLoggedIn ? 'bg-pastel-salmon' : 'bg-gray-200'">
-              <div class="w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-300" :class="isLoggedIn ? 'translate-x-3' : ''"></div>
-            </div>
-            <span class="text-xs font-bold" :class="isLoggedIn ? 'text-pastel-salmon' : 'text-gray-400'">{{ isLoggedIn ? 'Logged in' : 'Guest' }}</span>
-          </div>
-          <div v-if="isLoggedIn" @click="userTier = userTier === 'gold' ? 'silver' : 'gold'" class="text-[11px] text-gray-400 cursor-pointer hover:text-gray-600 select-none">
-            Tier: <strong class="text-amber-500">{{ userTier }}</strong> (tap to toggle)
+          <div v-if="isLoggedIn && userTier !== 'none'" class="text-[11px] text-gray-400 select-none bg-white px-3 py-1.5 rounded-xl shadow-glass border border-gray-100">
+            Tier: <strong class="text-amber-500">{{ userTier.charAt(0).toUpperCase() + userTier.slice(1) }}</strong>
           </div>
         </div>
       </div>
@@ -162,13 +173,16 @@ const sortedOffers = computed(() =>
           <div class="flex items-center gap-3">
             <button
               v-if="isUnlocked(sortedOffers[0])"
-              class="px-5 py-2 bg-gray-900 text-white font-bold text-sm rounded-full shadow-sm hover:bg-gray-800 transition active:scale-95"
+              @click="claimOffer(sortedOffers[0])"
+              :disabled="isClaimed(sortedOffers[0])"
+              class="px-5 py-2 font-bold text-sm rounded-full shadow-sm transition active:scale-95"
+              :class="isClaimed(sortedOffers[0]) ? 'bg-emerald-500 text-white cursor-not-allowed' : 'bg-gray-900 text-white hover:bg-gray-800'"
             >
-              Claim Now
+              {{ isClaimed(sortedOffers[0]) ? 'Claimed ✓' : 'Claim Now' }}
             </button>
             <button
               v-else
-              @click="isLoggedIn = true"
+              @click="openLogin"
               class="px-5 py-2 bg-white/60 backdrop-blur-sm text-gray-700 font-bold text-sm rounded-full hover:bg-white/80 transition active:scale-95"
             >
               Sign in to unlock
@@ -233,13 +247,16 @@ const sortedOffers = computed(() =>
 
                 <button
                   v-if="isUnlocked(offer)"
-                  class="px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-white font-bold text-[11px] rounded-full transition active:scale-95 whitespace-nowrap"
+                  @click="claimOffer(offer)"
+                  :disabled="isClaimed(offer)"
+                  class="px-3 py-1.5 font-bold text-[11px] rounded-full transition active:scale-95 whitespace-nowrap"
+                  :class="isClaimed(offer) ? 'bg-emerald-500 text-white cursor-not-allowed' : 'bg-gray-900 hover:bg-gray-800 text-white'"
                 >
-                  Claim
+                  {{ isClaimed(offer) ? 'Claimed ✓' : 'Claim' }}
                 </button>
                 <button
                   v-else-if="!isLoggedIn"
-                  @click="isLoggedIn = true"
+                  @click="openLogin"
                   class="px-3 py-1.5 bg-pastel-blue hover:bg-pastel-peri/60 text-indigo-700 font-bold text-[11px] rounded-full transition active:scale-95 whitespace-nowrap"
                 >
                   Sign in
